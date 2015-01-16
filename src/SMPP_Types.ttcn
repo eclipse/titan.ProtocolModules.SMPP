@@ -1,0 +1,580 @@
+/******************************************************************************
+* Copyright (c) 2013, 2014  Ericsson AB
+* All rights reserved. This program and the accompanying materials
+* are made available under the terms of the Eclipse Public License v1.0
+* which accompanies this distribution, and is available at
+* http://www.eclipse.org/legal/epl-v10.html
+*
+* Contributors:
+*   Gabor Szalai - initial implementation and initial documentation
+******************************************************************************/
+//
+//  File:               SMPPmsg_Types.ttcn
+//  Rev:                R2A
+//  Prodnr:             CNL 113 772
+//  Reference:          [1] Short Message Peer to Peer Protocol Specification v3.4
+//  Reference:          [2] Short Message Peer to Peer Protocol Specification v5.0
+
+
+module SMPP_Types {
+    // Reference: [1] 5.3.2
+
+
+external function f_decode_SMPP(in octetstring data, out SMPP_PDU  pdu) return integer
+      with { extension "prototype(backtrack)" }
+external function f_encode_SMPP(in SMPP_PDU pdu, out octetstring data)
+      with { extension "prototype(fast)" }
+
+
+external function f_msg_length(in octetstring data) return integer
+
+const octetstring c_SMPP_command_id_bind_receiver         := '00000001'O;
+const octetstring c_SMPP_command_id_bind_receiver_resp    := '80000001'O;
+const octetstring c_SMPP_command_id_bind_transmitter      := '00000002'O;
+const octetstring c_SMPP_command_id_bind_transmitter_resp := '80000002'O;
+const octetstring c_SMPP_command_id_submit_sm             := '00000004'O;
+const octetstring c_SMPP_command_id_submit_sm_resp        := '80000004'O;
+const octetstring c_SMPP_command_id_deliver_sm            := '00000005'O;
+const octetstring c_SMPP_command_id_deliver_sm_resp       := '80000005'O;
+const octetstring c_SMPP_command_id_unbind                := '00000006'O;
+const octetstring c_SMPP_command_id_unbind_resp           := '80000006'O;
+const octetstring c_SMPP_command_id_replace_sm            := '00000007'O;
+const octetstring c_SMPP_command_id_replace_sm_resp       := '80000007'O;
+const octetstring c_SMPP_command_id_cancel_sm             := '00000008'O;
+const octetstring c_SMPP_command_id_cancel_sm_resp        := '80000008'O;
+const octetstring c_SMPP_command_id_bind_transceiver      := '00000009'O;
+const octetstring c_SMPP_command_id_bind_transceiver_resp := '80000009'O;
+const octetstring c_SMPP_command_id_outbind               := '0000000B'O;
+const octetstring c_SMPP_command_id_enquire_link          := '00000015'O;
+const octetstring c_SMPP_command_id_enquire_link_resp     := '80000015'O;
+const octetstring c_SMPP_command_id_submit_multi          := '00000021'O;
+const octetstring c_SMPP_command_id_submit_multi_resp     := '80000021'O;
+const octetstring c_SMPP_command_id_generic_nack          := '80000000'O; 
+
+
+type enumerated SMPP_parameter_tag {
+  dest_addr_subunit            (5),
+  dest_network_type            (6),
+  dest_bearer_type             (7),
+  dest_telematics_id           (8),
+  source_addr_subunit         (13),
+  source_network_type         (14),
+  source_bearer_type          (15),
+  source_telematics_id        (16),
+  qos_time_to_live            (23),
+  payload_type                (25),
+  additional_status_info_text (29),
+  receipted_message_id        (30),
+  ms_msg_wait_facilities      (48),
+  privacy_indicator          (513),
+  source_subaddress          (514),
+  dest_subaddress            (515),
+  user_message_reference     (516),
+  user_response_code         (517),
+  source_port                (522),
+  destination_port           (523),
+  sar_msg_ref_num            (524),
+  language_indicator         (525),
+  sar_total_segments         (526),
+  sar_segment_seqnum         (527),
+  sc_interface_version       (528),
+  callback_num_pres_ind      (770),
+  callback_num_atag          (771),
+  number_of_messages         (772),
+  callback_num               (897),
+  dpf_result                (1056),
+  set_dpf                   (1057),
+  ms_availability_status    (1058),
+  network_error_code        (1059),
+  message_payload           (1060),
+  delivery_failure_reason   (1061),
+  more_messages_to_send     (1062),
+  message_state             (1063),
+  congestion_state          (1064),
+  ussd_service_op           (1281),
+  billing_identification    (1547),
+  source_network_id         (1549),
+  dest_network_id           (1550),
+  source_node_id            (1551),
+  dest_node_id              (1552),
+  dest_addr_np_resolution   (1553),
+  dest_addr_np_information  (1554),
+  dest_addr_np_country      (1555),
+  display_time              (4609),
+  sms_signal                (4611),
+  ms_validity               (4612),
+  alert_on_message_delivery (4876),
+  its_reply_type            (4992),
+  its_session_info          (4995)
+} with {
+  variant ""
+}
+
+// Reference: [2] 4.7.6
+type enumerated SMPP_error_code {
+  ESME_ROK                 (0),
+  ESME_RINVMSGLEN          (1),
+  ESME_RINVCMDLEN          (2),
+  ESME_RINVCMDID           (3),
+  ESME_RINVBNDSTS          (4),
+  ESME_RALYBND             (5),
+  ESME_RINVPRTFLG          (6),
+  ESME_RINVREGDLVFLG       (7),
+  ESME_RSYSERR             (8),
+  // 9 reserved
+  ESME_RINVSRCADR         (10),
+  ESME_RINVDSTADR         (11),
+  ESME_RINVMSGID          (12),
+  ESME_RBINDFAIL          (13),
+  ESME_RINVPASWD          (14),
+  ESME_RINVSYSID          (15),
+  // 16 reserved
+  ESME_RCANCELFAIL        (17),
+  // 18 reserved
+  ESME_RREPLACEFAIL       (19),
+  ESME_RMSGQFUL           (20),
+  ESME_RINVSERTYP         (21),
+  // 22-50 reserved
+  ESME_RINVNUMDESTS       (51),
+  ESME_RINVDLNAME         (52),
+  // 53-63 reserved
+  ESME_RINVDESTFLAG       (64),
+  // 65 reserved
+  ESME_RINVSUBREP         (66),
+  ESME_RINVESMCLASS       (67),
+  ESME_RCNTSUBDL          (68),
+  ESME_RSUBMITFAIL        (69),
+  // 70-71 reserved
+  ESME_RINVSRCTON         (72),
+  ESME_RINVSRCNPI         (73),
+  // Error in the standard? 74-79 missing
+  ESME_RINVDSTTON         (80),
+  ESME_RINVDSTNPI         (81),
+  // 82 reserved
+  ESME_RINVSYSTYP         (83),
+  ESME_RINVREPFLAG        (84),
+  ESME_RINVNUMMSGS        (85),
+  // 86-87 reserved
+  ESME_RTHROTTLED         (88),
+  // 89-96 reserved
+  ESME_RINVSCHED          (97),
+  ESME_RINVEXPIRY         (98),
+  ESME_RINVDFTMSGID       (99),
+  ESME_RX_T_APPN         (100),
+  ESME_RX_P_APPN         (101),
+  ESME_RX_R_APPN         (102),
+  ESME_RQUERYFAIL        (103),
+  // 104-191 reserved
+  ESME_RINVTLVSTREAM     (192),
+  ESME_RTLVNOTALLWD      (193),
+  ESME_RINVTLVLEN        (194),
+  ESME_RMISSINGTLV       (195),
+  ESME_RINVTLVVAL        (196),
+  // 197-253 reserved
+  ESME_RDELIVERYFAILURE  (254),
+  ESME_RUNKNOWNERR       (255),
+  ESME_RSERTYPUNAUTH     (256),
+  ESME_RPROHIBITED       (257),
+  ESME_RSERTYPUNAVAIL    (258),
+  ESME_RSERTYPDENIED     (259),
+  ESME_RINVDCS           (260),
+  ESME_RINVSRCADDRSUBUNIT (261),
+  ESME_RINVDSTADDRSUBUNIT (262),
+  ESME_RINVBCASTFREQINT   (263),
+  ESME_RINVBCASTALIAS_NAME (264),
+  ESME_RINVBCASTAREAFMT    (265),
+  ESME_RINVNUMBCAST_AREAS  (266),
+  ESME_RINVBCASTCNTTYPE    (267),
+  ESME_RINVBCASTMSGCLASS   (268),
+  ESME_RBCASTFAIL          (269),
+  ESME_RBCASTQUERYFAIL     (270),
+  ESME_RBCASTCANCELFAIL    (271),
+  ESME_RINVBCAST_REP       (272),
+  ESME_RINVBCASTSRVGRP     (273),
+  ESME_RINVBCASTCHANIND    (274)
+
+
+  // 274-1023 reserved for SMPP extension
+  // 1024-1279 reserved for SMSC vendor specific errors
+} with {
+  variant "FIELDLENGTH(32)";
+  variant "BYTEORDER(last)";
+}
+
+
+  // reference: [1] 5.2.5
+
+type enumerated SMPP_TON {
+  unknown           (0),
+  international     (1),
+  national          (2),
+  network_specific  (3),
+  subscriber_number (4),
+  alphanumeric      (5),
+  abbreviated       (6)
+} with {
+  variant "FIELDLENGTH(8)";
+}
+
+type enumerated SMPP_NPI {
+  unknown        (0),
+  isdn           (1),
+  data           (3),
+  telex          (4),
+  land_mobile    (6),
+  national       (8),
+  private_       (9),
+  ermes         (10),
+  internet      (14),
+  wap_client_id (18)
+} with {
+  variant "FIELDLENGTH(8)";
+}
+
+type enumerated SMPP_DEST_flag {
+  SME_address       (1),
+  distribution_list (2)
+} with {
+  variant "FIELDLENGTH(8)";
+}
+
+type bitstring SMPP_BIT1 length(8)
+with {
+  variant "FIELDLENGTH(8)";
+  variant "BITORDERINFIELD(lsb)"
+}
+
+type record SMPP_header {
+  integer         command_len,
+  octetstring     command_id length (4),
+  SMPP_error_code command_status,
+  integer         seq_num
+} with {
+  variant (command_len) "FIELDLENGTH(32)";
+  variant (command_id) "FIELDLENGTH(4)";
+  variant (command_status) "FIELDLENGTH(32)";
+  variant (seq_num) "FIELDLENGTH(32)";
+  variant (command_len) "BYTEORDER(last)";
+  variant (command_status) "BYTEORDER(last)";
+  variant (seq_num) "BYTEORDER(last)";
+}
+
+type union SMPP_optional_value {
+  octetstring  int0_1_val length(0..1),
+  integer      int1_val,
+  integer      int2_val,
+  octetstring  int4_val length(4),
+  octetstring  int1_5_val length(1..5),
+  bitstring    bstr_val length(8),
+  octetstring  ostr_val,
+  octetstring  ostr6_val length(6),
+  octetstring  ostr10_val length(10),
+  charstring   char_val
+
+}
+with { 
+  variant (int2_val) "BYTEORDER(last)";
+  variant (int2_val) "FIELDLENGTH(16)";
+}
+
+type record SMPP_optional_parameter
+{
+  SMPP_parameter_tag   tag,
+  integer               len,
+  SMPP_optional_value  opt_value optional
+}
+with {
+  variant (tag) "FIELDLENGTH(16), BYTEORDER(last)";
+  variant (len) "FIELDLENGTH(16)";
+  variant (len) "BYTEORDER(last)";
+  variant (opt_value) "CROSSTAG(
+    int0_1_val,{
+      tag = alert_on_message_delivery
+    };
+    int1_val,{
+      tag = dest_addr_subunit,
+      tag = source_addr_subunit, 
+      tag = dest_network_type,
+      tag = source_network_type,
+      tag = dest_bearer_type,
+      tag = source_bearer_type,
+      tag = source_telematics_id,
+      tag = payload_type,
+      tag = privacy_indicator,
+      tag = user_response_code,
+      tag = language_indicator,
+      tag = sar_total_segments,
+      tag = sar_segment_seqnum,
+      tag = sc_interface_version,
+      tag = display_time,
+      tag = ms_validity,
+      tag = dpf_result,
+      tag = set_dpf,
+      tag = ms_availability_status,
+      tag = delivery_failure_reason,
+      tag = more_messages_to_send,
+      tag = message_state,
+      tag = number_of_messages,
+      tag = its_reply_type,
+      tag = dest_addr_np_resolution,
+      tag = congestion_state,
+      tag = ussd_service_op 
+   };
+    int2_val, {
+      tag = dest_telematics_id,
+      tag = user_message_reference,
+      tag = source_port,
+      tag = destination_port,
+      tag = sar_msg_ref_num,
+      tag = sms_signal
+    };
+    int4_val, {
+      tag = qos_time_to_live
+    };
+    int1_5_val, { 
+      tag = dest_addr_np_country
+    };
+    bstr_val, { 
+      tag = ms_msg_wait_facilities,
+      tag = callback_num_pres_ind
+    };
+    ostr_val, { 
+      tag = source_subaddress,
+      tag = dest_subaddress,
+      tag = network_error_code,
+      tag = message_payload,
+      tag = callback_num,
+      tag = callback_num_atag,
+      tag = its_session_info,
+      tag = billing_identification
+    };
+    ostr6_val, {
+      tag = source_node_id,
+      tag = dest_node_id
+    };
+    ostr10_val, {
+      tag = dest_addr_np_information
+    };
+    char_val, {
+      tag = additional_status_info_text,
+      tag = receipted_message_id,
+      tag = source_network_id,
+      tag = dest_network_id
+    })";
+  variant (len) "LENGTHTO(opt_value), UNIT(octets)"
+}
+
+type record of SMPP_optional_parameter SMPP_optional_parameters;
+
+type record SMPP_Bind_resp {
+  charstring               system_id, //null terminated
+  SMPP_optional_parameters opt_pars
+};
+
+type record SMPP_Outbind {
+  charstring system_id, //null terminated
+  charstring password // null terminated
+};
+
+type record SMPP_Cancel {
+  charstring  service_type,
+  charstring  message_id,
+  SMPP_TON    source_addr_ton,
+  SMPP_NPI    source_addr_npi,
+  charstring  source_addr,
+  SMPP_TON    dest_addr_ton,
+  SMPP_NPI    dest_addr_npi,
+  charstring  destination_addr
+} 
+
+type record SMPP_Replace{
+  charstring   message_id,
+  SMPP_TON     source_addr_ton,
+  SMPP_NPI     source_addr_npi,
+  charstring   source_addr,
+  charstring   schedule_delivery_time,
+  charstring   validity_period,
+  integer      registered_delivery,
+  integer      sm_default_msg_id,
+  integer      sm_length,
+  octetstring  short_message,
+  SMPP_optional_parameters opt_pars
+} with {
+  variant (registered_delivery) "FIELDLENGTH(8)";
+  variant (sm_default_msg_id) "FIELDLENGTH(8)";
+  variant (sm_length) "LENGTHTO(short_message)";
+}
+
+type record SMPP_Bind {
+  charstring  system_id,
+  charstring  password,
+  charstring  system_type,
+  integer     interface_version,
+  SMPP_TON    addr_ton,
+  SMPP_NPI    addr_npi,
+  charstring  address_range
+} with {
+  variant (interface_version) "FIELDLENGTH(8)";
+}
+
+
+type union SMPP_SME_or_DL {
+  SMPP_SME_dest_addr  sme_dest_addr,
+  charstring          dl_name
+}
+
+type record SMPP_SME_dest_addr {
+  SMPP_TON    dest_addr_ton,
+  SMPP_NPI    dest_addr_npi,
+  charstring  destination_addr
+}
+
+type record SMPP_dest_address {
+  SMPP_DEST_flag  dest_flag,
+  SMPP_SME_or_DL  dest_address
+} with {
+  variant (dest_address) "CROSSTAG(
+        sme_dest_addr, {dest_flag = SME_address };
+        dl_name,       {dest_flag = distribution_list };
+    )"
+}
+
+type record of SMPP_dest_address SMPP_dest_address_list;
+
+type record SMPP_MULTI {
+  charstring                service_type,
+  SMPP_TON                  source_addr_ton,
+  SMPP_NPI                  source_addr_npi,
+  charstring                source_addr,
+  integer                   number_of_dests,
+  SMPP_dest_address_list    dest_address,
+  SMPP_BIT1                 esm_class,
+  integer                   protocol_id,
+  integer                   priority_flag,
+  charstring                schedule_delivery_time,
+  charstring                validity_period,
+  SMPP_BIT1                 registered_delivery,
+  integer                   replace_if_present, // =0
+  SMPP_BIT1                 data_coding,
+  integer                   sm_default_msg_id, // =0
+  integer                   sm_length,
+  octetstring               short_message,
+  SMPP_optional_parameters  opt_pars
+
+} with {
+  variant (number_of_dests) "FIELDLENGTH(8)";
+  variant (number_of_dests) "LENGTHTO(dest_address), UNIT(elements)";
+  variant (protocol_id) "FIELDLENGTH(8)";
+  variant (priority_flag) "FIELDLENGTH(8)";
+  variant (replace_if_present) "FIELDLENGTH(8)";
+  variant (sm_default_msg_id) "FIELDLENGTH(8)";
+  variant (sm_length) "LENGTHTO(short_message)";
+}
+
+
+type record SMPP_Unsuccess_sme {
+  SMPP_TON    dest_addr_ton,
+  SMPP_NPI    dest_addr_npi,
+  charstring  destination_addr,
+  SMPP_error_code   error_status_code  
+}
+
+type record of SMPP_Unsuccess_sme SMPP_Unsuccess_sme_list;
+
+type record SMPP_MULTI_resp {
+  charstring    message_id, // null terminated
+  integer       no_unsuccess,
+  SMPP_Unsuccess_sme_list  unsucecss_sme,
+  SMPP_optional_parameters opt_pars optional
+} with {
+  variant (no_unsuccess) "FIELDLENGTH(8)";
+  variant (no_unsuccess) "LENGTHTO(unsucecss_sme), UNIT(elements)";
+}
+
+type record SMPP_SM {
+  charstring  service_type,
+  SMPP_TON    source_addr_ton,
+  SMPP_NPI    source_addr_npi,
+  charstring  source_addr,
+  SMPP_TON    dest_addr_ton,
+  SMPP_NPI    dest_addr_npi,
+  charstring  destination_addr,
+  SMPP_BIT1   esm_class,
+  integer     protocol_id,
+  integer     priority_flag,
+  charstring  schedule_delivery_time,
+  charstring  validity_period,
+  SMPP_BIT1   registered_delivery,
+  integer     replace_if_present, // =0
+  SMPP_BIT1   data_coding,
+  integer     sm_default_msg_id, // =0
+  integer     sm_length,
+  octetstring short_message,
+  SMPP_optional_parameters opt_pars
+
+} with {
+  variant (protocol_id) "FIELDLENGTH(8)";
+  variant (priority_flag) "FIELDLENGTH(8)";
+  variant (replace_if_present) "FIELDLENGTH(8)";
+  variant (sm_default_msg_id) "FIELDLENGTH(8)";
+  variant (sm_length) "LENGTHTO(short_message)";
+}
+
+
+type record SMPP_SM_resp {
+  charstring    message_id, // null terminated
+  SMPP_optional_parameters opt_pars optional
+};
+
+type record SMPP_void {};
+
+type union SMPP_operation_body {
+  // the raw field is needed because Titan's raw decoder can not
+  // decode C-Octetstring (null terminated) fields
+  octetstring     raw,
+  SMPP_Bind       bind_transmitter,
+  SMPP_Bind_resp  bind_transmitter_resp,
+
+  SMPP_Bind       bind_receiver,
+  SMPP_Bind_resp  bind_receiver_resp,
+
+  SMPP_Bind       bind_transceiver,
+  SMPP_Bind_resp  bind_transceiver_resp,
+
+  SMPP_Outbind    outbind,
+
+  SMPP_void       unbind,
+  SMPP_void       unbind_resp,
+
+  SMPP_SM         submit_sm,
+  SMPP_SM_resp    submit_sm_resp,
+
+  SMPP_MULTI      submit_multi,
+  SMPP_MULTI_resp submit_multi_resp,
+
+  SMPP_SM         deliver_sm,
+  SMPP_SM_resp    deliver_sm_resp,
+
+  SMPP_Cancel     cancel_sm,
+  SMPP_void       cancel_sm_resp,
+
+  SMPP_Replace    replace_sm,
+  SMPP_void       replace_sm_resp,
+
+  SMPP_void       enquire_link,
+  SMPP_void       enquire_link_resp,
+
+  SMPP_void       generic_nack
+}
+type record SMPP_PDU {
+  SMPP_header          header,
+  SMPP_operation_body  body
+}
+ with {
+  variant (header) "LENGTHTO (header, body)";
+  variant (header) "LENGTHINDEX (command_len)";
+
+}
+
+
+} with { encode "RAW" } // end module

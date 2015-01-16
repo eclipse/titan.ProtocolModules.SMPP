@@ -1,0 +1,7 @@
+<!DOCTYPE TITAN_GUI_FileGroup_file>
+<FileGroup TITAN_version="3.1.pl0" >
+    <File_Group name="SMPP_CNL113772" >
+        <File path="SMPP_EncDec.cc" />
+        <File path="SMPP_Types.ttcn" />
+    </File_Group>
+</FileGroup>
