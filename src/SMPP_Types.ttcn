@@ -50,6 +50,7 @@ const octetstring c_SMPP_command_id_enquire_link_resp     := '80000015'O;
 const octetstring c_SMPP_command_id_submit_multi          := '00000021'O;
 const octetstring c_SMPP_command_id_submit_multi_resp     := '80000021'O;
 const octetstring c_SMPP_command_id_generic_nack          := '80000000'O; 
+const octetstring c_SMPP_command_id_alert_notification    := '00000102'O;
 
 
 type enumerated SMPP_parameter_tag {
@@ -528,6 +529,16 @@ type record SMPP_SM_resp {
 
 type record SMPP_void {};
 
+type record SMPP_AlertNotif {
+  SMPP_TON       source_addr_ton,
+  SMPP_NPI       source_addr_npi,
+  charstring     source_addr,
+  SMPP_TON       esme_addr_ton,
+  SMPP_NPI       esme_addr_npi,
+  charstring     esme_addr,
+  SMPP_optional_parameters opt_pars
+};
+
 type union SMPP_operation_body {
   // the raw field is needed because Titan's raw decoder can not
   // decode C-Octetstring (null terminated) fields
@@ -563,6 +574,8 @@ type union SMPP_operation_body {
 
   SMPP_void       enquire_link,
   SMPP_void       enquire_link_resp,
+
+  SMPP_AlertNotif alert_notif,
 
   SMPP_void       generic_nack
 }

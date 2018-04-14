@@ -7,6 +7,7 @@
 *
 * Contributors:
 *   Gabor Szalai - initial implementation and initial documentation
+*   Harald Welte - Alert Notification support
 ******************************************************************************/
 //
 //  File:               SMPP_EncDec.cc
@@ -27,6 +28,7 @@ namespace SMPP__Types {
   void decode_SMPP_Outbind(TTCN_Buffer& input, SMPP__Outbind& output);
   void decode_SMPP_MULTI(TTCN_Buffer& input, const unsigned int body_length, SMPP__MULTI& output);
   void decode_SMPP_MULTI_resp(TTCN_Buffer& input, const unsigned int body_length, SMPP__MULTI__resp& output);
+  void decode_SMPP_AlertNotif(TTCN_Buffer& input, const unsigned int body_length, SMPP__AlertNotif& output);
 
   // puts '\0' octets at the end of C-Octetstrings
   void pad_C_Octetstrings(SMPP__PDU& data);
@@ -41,6 +43,7 @@ namespace SMPP__Types {
   void pad_C_Octetstrings(SMPP__SM__resp& data);
   void pad_C_Octetstrings(SMPP__MULTI& data);
   void pad_C_Octetstrings(SMPP__MULTI__resp& data);
+  void pad_C_Octetstrings(SMPP__AlertNotif& data);
   
   void pad_C_Octetstring(CHARSTRING& data);
  
@@ -135,7 +138,10 @@ INTEGER f__decode__SMPP(const OCTETSTRING& data, SMPP__PDU&  pdu){
     
   } else if (pdu.header().command__id() == c__SMPP__command__id__generic__nack){
     pdu.body().generic__nack() = NULL_VALUE;
-    
+
+  } else if (pdu.header().command__id() == c__SMPP__command__id__alert__notification) {
+    decode_SMPP_AlertNotif(input, pdu.header().command__len() - 16, pdu.body().alert__notif());
+
   } else {
     TTCN_warning("Decoding of incoming message not implemented.");
     int body_length = pdu.header().command__len() - 16;
@@ -253,6 +259,10 @@ void pad_C_Octetstrings(SMPP__PDU& data) {
     // void 
   }
   break;
+  case SMPP__operation__body::ALT_alert__notif: {
+    pad_C_Octetstrings(body.alert__notif());
+  }
+  break;
   default:  
     TTCN_error("Unhandled union field in SMPP_operation_body.");
   }
@@ -329,6 +339,12 @@ void pad_C_Octetstrings(SMPP__Replace& data){
   pad_C_Octetstring(data.source__addr());
   pad_C_Octetstring(data.schedule__delivery__time());
   pad_C_Octetstring(data.validity__period());
+  pad_C_Octetstrings(data.opt__pars());
+}
+
+void pad_C_Octetstrings(SMPP__AlertNotif& data){
+  pad_C_Octetstring(data.source__addr());
+  pad_C_Octetstring(data.esme__addr());
   pad_C_Octetstrings(data.opt__pars());
 }
 
@@ -625,6 +641,31 @@ void decode_SMPP_Replace(TTCN_Buffer& input, const unsigned int body_length, SMP
   
   // optional parameters
   
+  if (remaining_bytes > 0) { // should be >=4 in this case anyway
+    if (remaining_bytes < 4) {
+      TTCN_warning("Invalid length of optional parameters.");
+      output.opt__pars() = NULL_VALUE;
+    } else {
+      output.opt__pars().decode(SMPP__optional__parameters_descr_, input, TTCN_EncDec::CT_RAW);
+    }
+  } else {
+    output.opt__pars() = NULL_VALUE;
+  }
+  crop_C_Octetstrings(output.opt__pars());
+}
+
+void decode_SMPP_AlertNotif(TTCN_Buffer& input, const unsigned int body_length,
+			    SMPP__AlertNotif& output) {
+  unsigned int remaining_bytes = body_length;
+  output.source__addr__ton() = pick_int(input);
+  output.source__addr__npi() = pick_int(input);
+  remaining_bytes -= 2;
+  remaining_bytes -= pick_cos(input, output.source__addr());
+  output.esme__addr__ton() = pick_int(input);
+  output.esme__addr__npi() = pick_int(input);
+  remaining_bytes -= 2;
+  remaining_bytes -= pick_cos(input, output.esme__addr());
+
   if (remaining_bytes > 0) { // should be >=4 in this case anyway
     if (remaining_bytes < 4) {
       TTCN_warning("Invalid length of optional parameters.");
