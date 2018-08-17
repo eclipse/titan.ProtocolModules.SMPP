@@ -1,0 +1,90 @@
+---
+Author: Gábor Szalai
+Version: 1551-CNL 113 772, Rev. A
+Date: 2013-04-15
+
+---
+= SMPP protocol module for TTCN-3 Toolset with TITAN, Function Description
+:author: Gábor Szalai
+:revnumber: 1551-CNL 113 772, Rev. A
+:revdate: 2013-04-15
+:toc:
+
+= Functionality
+
+The SMPP protocol module provides type definitions, encoder, and decoder functions to handle SMPP messages defined by the standard <<_2, [2]>>.
+
+== Implemented Protocols
+
+The SMPP protocol module implements the messages, and information elements defined in Short Message Peer to Peer Protocol Specification v5.0, Document Issue 1.2 <<_2, [2]>>.
+
+=== Supported SMPP Messages
+
+The test port supports sending and reception of the following SMPP PDUs as defined in <<_2, [2]>>.
+
+* `BIND_TRANSMITTER`
+* `BIND_TRANSMITTER_RESP`
+* `BIND_RECEIVER`
+* `BIND_RECEIVER_RESP`
+* `BIND_TRANSCEIVER`
+* `BIND_TRANSCEIVER_RESP`
+* `OUTBIND`
+* `UNBIND`
+* `UNBIND_RESP`
+* `SUBMIT_SM`
+* `SUBMIT_SM_RESP`
+* `SUBMIT_MULTI`
+* `SUBMIT_MULTI_RESP`
+* `DELIVER_SM`
+* `DELIVER_SM_RESP`
+* `ENQUIRE_LINK`
+* `ENQUIRE_LINK_RESP`
+* `CANCEL_SM`
+* `CANCEL_SM_RESP`
+* `REPLACE_SM`
+* `REPLACE_SM_RESP`
+* `GENERICK_NACK`
+
+Other SMPP PDUs are accepted on reception, but only the protocol header is decoded.
+
+PDU encoding/decoding is based on RAW attributes <<_3, [3]>>.
+
+== System Requirements
+
+In order to operate the SMPP test port the following system requirements must be satisfied:
+
+* TITAN TTCN-3 Test Executor version R8B (1.8.pl1) or higher installed. Please note: This version of the test port is not compatible with TITAN releases earlier than R8B.
+
+== Installation
+
+Since the SMPP test port is used as a part of the TTCN-3 test environment this requires TTCN-3 Test Executor to be installed before any operation of the SMPP test port. For more details on the installation of TTCN-3 Test Executor see the relevant section of <<_3, [3]>>.
+
+== Encoder/Decoder Functions
+
+The SMPP protocol module declares the following encoder, and decoder functions:
+
+[source]
+----
+external function f_decode_SMPP(in octetstring data, out SMPP_PDU pdu) return integer with { extension "prototype(backtrack)" }
+
+external function f_encode_SMPP(in SMPP_PDU pdu, out octetstring data) with { extension "prototype(fast)" }
+----
+
+== Message Length Calculation Function
+
+The following function can be used to calculate the length of the received message. The function returns the length of the received message in octets or `_-1_` if the length can not be calculated.
+
+[source]
+external function f_msg_length(in octetstring data) return integer
+
+= References
+
+[[_1]]
+[1] ETSI ES 201 873-1 v4.5.1 +
+The Testing and Test Control Notation version 3. Part 1: Core Language
+
+[[_2]]
+[2] Short Message Peer to Peer Protocol Specification v5.0, Document Issue 1.2, SMPP Developers Forum
+
+[[_3]]
+[3] Programmer’s Technical Reference for TITAN TTCN–3 Test Executor
